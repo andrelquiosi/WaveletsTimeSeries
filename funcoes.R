@@ -33,9 +33,7 @@ processa_dados_precipitacao <- function(ecmwf_step_240, parana_sp) {
 # Função para criar os recortes do Paraná
 criar_recortes_pr <- function() {
   # Carregar shapefiles e metadados
-  ogrInfo(".", "brasil")
-  brasil <- readOGR(".", "brasil")
-
+   brasil <- readOGR("./Centroides", "brasil")
   # Extrair coordenadas do contorno do Paraná
   parana_contorno <- brasil@polygons[[221]]@Polygons[[1]]@coords
 
@@ -53,13 +51,13 @@ criar_recortes_pr <- function() {
   )
 
   # Retornar uma lista com os objetos criados
-  return(parana_sp, parana_spdf)
+  return(list(parana_sp, parana_spdf))
 }
 
 # Função para criar os recortes da Mesorregião do Oeste do Paraná
 criar_recortes_oeste_pr <- function() {
   # Carregar coordenadas da Mesorregião do Oeste do Paraná
-  oestepr_contorno <- read.table("oestepr_contorno.txt")
+  oestepr_contorno <- read.table("Centroides/oestepr_contorno.txt")
 
   # Criar objeto SpatialPolygons para a Mesorregião do Oeste do Paraná
   oestepr_polygon <- Polygon(oestepr_contorno)
