@@ -33,7 +33,7 @@ processa_dados_precipitacao <- function(ecmwf_step_240, parana_sp) {
 # Função para criar os recortes do Paraná
 criar_recortes_pr <- function() {
   # Carregar shapefiles e metadados
-   brasil <- readOGR("./Centroides", "brasil")
+  brasil <- readOGR("./Centroides", "brasil")
   # Extrair coordenadas do contorno do Paraná
   parana_contorno <- brasil@polygons[[221]]@Polygons[[1]]@coords
 
@@ -69,4 +69,37 @@ criar_recortes_oeste_pr <- function() {
     )
   )
   return(oestepr_sp)
+}
+
+criar_circulo_toledo_cascavel <- function() {
+  # Definir o raio do círculo
+  raio <- 0.36
+
+  # Definir o índice do pixel central
+  p <- 38 # p varia de 1 a 165
+
+  # Obter as coordenadas do centróide do pixel
+  # centroide <- coordinates(clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster[[1]])[which(!is.na(values(clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster[[1]])))[p]]
+  # centroide
+  centroide <- c(-54, -25)
+
+  # Calcular as coordenadas dos pontos que formam o círculo
+  angulos <- seq(0, 2 * pi, length.out = 360)
+  x <- centroide[1] + raio * cos(angulos)
+  y <- centroide[2] + raio * sin(angulos)
+  coords_circulo <- cbind(x, y)
+
+  # Criar o objeto Polygon
+  poligono <- Polygon(coords_circulo)
+
+  # Criar o objeto SpatialPolygons
+  sp_poligono <- SpatialPolygons(list(Polygons(list(poligono), ID = "s1")),
+    proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs")
+  )
+
+  # Criar o objeto SpatialPolygonsDataFrame
+  spdf_circulo <- SpatialPolygonsDataFrame(
+    sp_poligono, data.frame(z = 1:1, row.names = c("s1"))
+  )
+  return(spdf_circulo)
 }

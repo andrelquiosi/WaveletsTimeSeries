@@ -86,6 +86,7 @@ spplot(ecmwf_step_240_201801_t00_d1_d11_d20, scales = list(draw = TRUE))
 # Criar os recortes do Paraná e da Mesorregião do Oeste do Paraná
 mapa_parana <- criar_recortes_pr()
 oestepr_sp <- criar_recortes_oeste_pr()
+circulo_toledo_cascavel <- criar_circulo_toledo_cascavel()
 
 clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster <-
   processa_dados_precipitacao(ecmwf_step_240_201801, mapa_parana[[1]])
@@ -97,3 +98,30 @@ spplot(
   sp.layout = list(list(mapa_parana[[2]], oestepr_sp, first = FALSE))
 )
 
+# Plotar o círculo
+spplot(
+  clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster,
+  scales = list(draw = TRUE),
+  sp.layout = list(
+    list(mapa_parana[[2]], oestepr_sp, first = FALSE),
+    list(oestepr_sp, lwd = 2, first = FALSE),
+    list(circulo_toledo_cascavel, lwd = 2, first = FALSE)
+  )
+)
+
+spplot(
+  clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster,
+  scales = list(draw = TRUE),
+  sp.layout = list(
+    list(mapa_parana[[2]], oestepr_sp, first = FALSE),
+    list(oestepr_sp, lwd = 2, first = FALSE),
+    list("sp.text", c(-54, -24.5), "1"),
+    list("sp.text", c(-53.5, -24.5), "2"),
+    list("sp.text", c(-54, -25), "3"),
+    list("sp.text", c(-53.5, -25), "4"),
+    list("sp.text", c(-53, -25), "5"),
+    list("sp.text", c(-54.45, -25.4), "6"),
+    list("sp.text", c(-54, -25.4), "7"),
+    list("sp.text", c(-53.5, -25.4), "8")
+  )
+)
