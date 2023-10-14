@@ -1,4 +1,4 @@
-# Função para empilhar os dados de precipitação 3 decêndios
+# Função para empilhar (stack) os dados de precipitação 3 decêndios
 stack_d1_d11_d20 <- function(grib_stack) {
   grib_stack_t00_d1_d11_d20 <- stack(
     grib_stack[[1]],
@@ -8,11 +8,23 @@ stack_d1_d11_d20 <- function(grib_stack) {
   return(grib_stack_t00_d1_d11_d20)
 }
 
-# Função para preparar os dados de precipitação para plotagem 3 decêndios
-prepara_plot_decendios <- function(ecmwf_step_240) {
-  # Empilhar os dados de precipitação
-  ecmwf_step_240_d1_d11_d20 <- stack_d1_d11_d20(ecmwf_step_240)
-  return(ecmwf_step_240_d1_d11_d20)
+# Função para empilhar (list) os dados de precipitação 3 decêndios
+list_d1_d11_d20 <- function(grib_mes) {
+  grib_list_mes_d1_d11_d20 <- list(
+    values(grib_mes[[1]]),
+    values(grib_mes[[11]]),
+    values(grib_mes[[20]])
+  )
+  return(grib_list_mes_d1_d11_d20)
+}
+
+# Função para selecionar o pixel de interesse em 3 decêndios
+seleciona_pixel <- function(pixel, decendios) {
+  valores_pixel <- c()
+  for (i in seq_along(decendios)) {
+    valores_pixel <- c(valores_pixel, decendios[[i]][[pixel]])
+  }
+  return(valores_pixel)
 }
 
 # Função para preparar os dados de precipitação para plotagem 3 decêndios
@@ -106,7 +118,6 @@ ler_arquivos_grib <- function(ano) {
 }
 
 raster_arquivos <- function(gribs_list, parana_spdf) {
-
   # Criar uma lista vazia para armazenar as pilhas de raster de cada arquivo GRIB
   raster_list <- list()
   # Loop sobre os arquivos GRIB
@@ -133,42 +144,42 @@ raster_arquivos <- function(gribs_list, parana_spdf) {
 
 datas_para_plotar <- function() {
   datas <- c(
-    "Decêndio: 01 Jan",
-    "Decêndio: 11 Jan",
-    "Decêndio: 20 Jan",
-    "Decêndio: 01 Fev",
-    "Decêndio: 11 Fev",
-    "Decêndio: 20 Fev",
-    "Decêndio: 01 Mar",
-    "Decêndio: 11 Mar",
-    "Decêndio: 20 Mar",
-    "Decêndio: 01 Abr",
-    "Decêndio: 11 Abr",
-    "Decêndio: 20 Abr",
-    "Decêndio: 01 Mai",
-    "Decêndio: 11 Mai",
-    "Decêndio: 20 Mai",
-    "Decêndio: 01 Jun",
-    "Decêndio: 11 Jun",
-    "Decêndio: 20 Jun",
-    "Decêndio: 01 Jul",
-    "Decêndio: 11 Jul",
-    "Decêndio: 20 Jul",
-    "Decêndio: 01 Ago",
-    "Decêndio: 11 Ago",
-    "Decêndio: 20 Ago",
-    "Decêndio: 01 Set",
-    "Decêndio: 11 Set",
-    "Decêndio: 20 Set",
-    "Decêndio: 01 Out",
-    "Decêndio: 11 Out",
-    "Decêndio: 20 Out",
-    "Decêndio: 01 Nov",
-    "Decêndio: 11 Nov",
-    "Decêndio: 20 Nov",
-    "Decêndio: 01 Dez",
-    "Decêndio: 11 Dez",
-    "Decêndio: 20 Dez"
+    "01 Jan",
+    "11 Jan",
+    "20 Jan",
+    "01 Fev",
+    "11 Fev",
+    "20 Fev",
+    "01 Mar",
+    "11 Mar",
+    "20 Mar",
+    "01 Abr",
+    "11 Abr",
+    "20 Abr",
+    "01 Mai",
+    "11 Mai",
+    "20 Mai",
+    "01 Jun",
+    "11 Jun",
+    "20 Jun",
+    "01 Jul",
+    "11 Jul",
+    "20 Jul",
+    "01 Ago",
+    "11 Ago",
+    "20 Ago",
+    "01 Set",
+    "11 Set",
+    "20 Set",
+    "01 Out",
+    "11 Out",
+    "20 Out",
+    "01 Nov",
+    "11 Nov",
+    "20 Nov",
+    "01 Dez",
+    "11 Dez",
+    "20 Dez"
   )
   return(datas)
 }

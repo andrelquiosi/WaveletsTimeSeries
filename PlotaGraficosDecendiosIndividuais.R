@@ -1,8 +1,11 @@
 # Intalação de Pacotes
-# install.packages(c(
-#   "rgdal", "raster", "sp",
-#   "maptools", "rworldmap", "rgeos", "WaveletComp"
-# ))
+if (!require("rgdal")) install.packages("rgdal", repos = "http://cran.us.r-project.org")
+if (!require("raster")) install.packages("raster", repos = "http://cran.us.r-project.org")
+if (!require("sp")) install.packages("sp", repos = "http://cran.us.r-project.org")
+if (!require("maptools")) install.packages("maptools", repos = "http://cran.us.r-project.org")
+if (!require("rworldmap")) install.packages("rworldmap", repos = "http://cran.us.r-project.org")
+if (!require("rgeos")) install.packages("rgeos", repos = "http://cran.us.r-project.org")
+if (!require("WaveletComp")) install.packages("WaveletComp", repos = "http://cran.us.r-project.org")
 
 # Carregar Pacotes
 packs <- c(
@@ -21,29 +24,30 @@ oestepr_sp <- criar_recortes_oeste_pr()
 # Criar o círculo em Toledo e Cascavel
 centroide <- c(-53.5, -25)
 circulo_toledo_cascavel <- criar_circulo_toledo_cascavel(centroide)
+# ano para rodar os scrypts
+anos <- c("2018", "2019", "2020", "2021", "2022")
+mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 {
-  # ano para rodar os scrypts
-  ano <- "2018"
-
+  ano <- anos[1]
+  mes <- mes[1]
   # carrega os dados (GRIB) de um ano em decendios
   # (parametro ano corresponde a pasta com os arquivo)
   raster_ano_selecionado <- ler_arquivos_grib(ano)
-
   # Empilhar os dados de precipitação do grib escolhodo
   ecmwf_step_240_t00_d1_d11_d20 <-
-    prepara_plot_decendios(raster_ano_selecionado[[1]])
+    stack_d1_d11_d20(raster_ano_selecionado[[mes]])
 
   # Plotar os dados do grib escolhido
   spplot(ecmwf_step_240_t00_d1_d11_d20, scales = list(draw = TRUE))
 
   #
   clipe_ecmwf_d1_d11_d20_soma_raster <-
-    processa_dados_precipitacao(raster_ano_selecionado[[1]], mapa_parana[[1]])
+    processa_dados_precipitacao(raster_ano_selecionado[[mes]], mapa_parana[[1]])
 
   # Plotar os dados no mapa do Paraná com a Mesorregião do Oeste do Paraná
   # com o círculo em Toledo e Cascavel
   # cria a legenda para o mapa
-  legenda1 <- paste(
+  legenda <- paste(
     "Dados de Previsão de Precipitação do ECMWF, para o ano de ",
     ano,
     ", com previsão para 240h\nInseridos na Mesorregião do Oeste do Paraná"
@@ -55,7 +59,7 @@ circulo_toledo_cascavel <- criar_circulo_toledo_cascavel(centroide)
       list(mapa_parana[[2]], oestepr_sp, first = FALSE),
       list(oestepr_sp, lwd = 2, first = FALSE),
       list(circulo_toledo_cascavel, lwd = 2, first = FALSE)
-    ), main = legenda1
+    ), main = legenda
   )
 
   # Plotar os dados no mapa do Paraná com a Mesorregião do Oeste do Paraná
@@ -78,46 +82,9 @@ circulo_toledo_cascavel <- criar_circulo_toledo_cascavel(centroide)
   )
 }
 
-anos <- c("2018", "2019", "2020", "2021", "2022")
-ano <- anos[5]
-# carrega os dados (GRIB) de um ano em decendios
-# (parametro ano corresponde a pasta com os arquivo)
-raster_ano_selecionado <- ler_arquivos_grib(ano)
-raster_com_decendios <- raster_arquivos(raster_ano_selecionado, mapa_parana[[1]])
-
-# cria os labels para o eixo x e y
-x_labels <- c("", "54°W", "", "50°W", "", "")
-y_labels <- c("26°S", "", "25°S", "", "24°S", "", "23°S")
-
-# cria a legenda para o mapa
-legenda <- paste(
-  "Dados de Previsão de Precipitação do ECMWF, para o ano de ",
-  ano,
-  ", com previsão para 240h\nInseridos na Mesorregião do Oeste do Paraná"
-)
-
-# carrega as legendas dos decendios para plotar
-legenda_decendios <- datas_para_plotar()
-
 # Criar o arquivo PNG
-nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, ".png")
-png(nome_arquivo, width = 1000, height = 1000, units = "px", pointsize = 12)
+nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, "_", mes, ".png")
+png(nome_arquivo, width = 10, height = 10, units = "in", res = 300)
 
-spplot(
-  raster_com_decendios,
-  scales = list(
-    draw = TRUE,
-    alternating = 1,
-    x = list(labels = x_labels),
-    y = list(labels = y_labels)
-  ),
-  sp.layout = list(
-    list(mapa_parana[[2]], oestepr_sp, lwd = 0.5, col = "#3d3d3d", first = FALSE),
-    list(oestepr_sp, lwd = 0.5, col = "#3d3d3d", first = FALSE),
-    list(circulo_toledo_cascavel, lwd = 0.5, col = "#3d3d3d", first = FALSE)
-  ),
-  main = legenda,
-  names.attr = legenda_decendios
-)
 # Finalizar o arquivo SVG
 dev.off()
