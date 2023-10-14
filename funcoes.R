@@ -12,12 +12,6 @@ stack_d1_d11_d20 <- function(grib_stack) {
 prepara_plot_decendios <- function(ecmwf_step_240) {
   # Empilhar os dados de precipitação
   ecmwf_step_240_d1_d11_d20 <- stack_d1_d11_d20(ecmwf_step_240)
-  # Renomear as bandas
-  names(ecmwf_step_240_d1_d11_d20) <- c(
-    "Precipitação 1 ao 10",
-    "Precipitação 11 ao 20",
-    "Precipitação 21 ao 30"
-  )
   return(ecmwf_step_240_d1_d11_d20)
 }
 
@@ -71,18 +65,9 @@ criar_recortes_oeste_pr <- function() {
   return(oestepr_sp)
 }
 
-criar_circulo_toledo_cascavel <- function() {
+criar_circulo_toledo_cascavel <- function(centroide) {
   # Definir o raio do círculo
   raio <- 0.36
-
-  # Definir o índice do pixel central
-  p <- 38 # p varia de 1 a 165
-
-  # Obter as coordenadas do centróide do pixel
-  # centroide <- coordinates(clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster[[1]])[which(!is.na(values(clipe_ecmwf_step_240_201801T00_d1_d11_d20_soma_raster[[1]])))[p]]
-  # centroide
-  centroide <- c(-54, -25)
-
   # Calcular as coordenadas dos pontos que formam o círculo
   angulos <- seq(0, 2 * pi, length.out = 360)
   x <- centroide[1] + raio * cos(angulos)
@@ -102,4 +87,88 @@ criar_circulo_toledo_cascavel <- function() {
     sp_poligono, data.frame(z = 1:1, row.names = c("s1"))
   )
   return(spdf_circulo)
+}
+
+ler_arquivos_grib <- function(ano) {
+  grib_dir <- paste0(ano)
+
+  # Get a list of all the GRIB files in the directory
+  grib_files <- list.files(grib_dir, pattern = "*.grib", full.names = TRUE)
+
+  # Create an empty list to store the raster stacks
+  grib_stacks <- list()
+
+  # Loop through each GRIB file and read it into a raster stack
+  for (i in seq_along(grib_files)) {
+    grib_stacks[[i]] <- stack(grib_files[i])
+  }
+  return(grib_stacks)
+}
+
+raster_arquivos <- function(gribs_list, parana_spdf) {
+
+  # Criar uma lista vazia para armazenar as pilhas de raster de cada arquivo GRIB
+  raster_list <- list()
+  # Loop sobre os arquivos GRIB
+  for (grib in gribs_list) {
+    # Empilhar as camadas do arquivo GRIB em uma pilha de raster
+    raster_grib <- stack_d1_d11_d20(grib)
+
+    # Adicionar a pilha de raster à lista de pilhas de raster
+    raster_list <- append(raster_list, list(raster_grib))
+  }
+
+  # Empilhar todas as pilhas de raster em uma única pilha de raster
+  pilha_raster <- do.call(stack, raster_list)
+
+  # Rasterizar o polígono de recorte
+  raster_parana <- rasterize(parana_spdf, pilha_raster)
+
+  # Recortar o raster para o polígono de recorte
+  clipe_raster <- mask(pilha_raster, raster_parana)
+
+  # Retornar o raster recortado
+  return(clipe_raster)
+}
+
+datas_para_plotar <- function() {
+  datas <- c(
+    "Decêndio: 01 Jan",
+    "Decêndio: 11 Jan",
+    "Decêndio: 20 Jan",
+    "Decêndio: 01 Fev",
+    "Decêndio: 11 Fev",
+    "Decêndio: 20 Fev",
+    "Decêndio: 01 Mar",
+    "Decêndio: 11 Mar",
+    "Decêndio: 20 Mar",
+    "Decêndio: 01 Abr",
+    "Decêndio: 11 Abr",
+    "Decêndio: 20 Abr",
+    "Decêndio: 01 Mai",
+    "Decêndio: 11 Mai",
+    "Decêndio: 20 Mai",
+    "Decêndio: 01 Jun",
+    "Decêndio: 11 Jun",
+    "Decêndio: 20 Jun",
+    "Decêndio: 01 Jul",
+    "Decêndio: 11 Jul",
+    "Decêndio: 20 Jul",
+    "Decêndio: 01 Ago",
+    "Decêndio: 11 Ago",
+    "Decêndio: 20 Ago",
+    "Decêndio: 01 Set",
+    "Decêndio: 11 Set",
+    "Decêndio: 20 Set",
+    "Decêndio: 01 Out",
+    "Decêndio: 11 Out",
+    "Decêndio: 20 Out",
+    "Decêndio: 01 Nov",
+    "Decêndio: 11 Nov",
+    "Decêndio: 20 Nov",
+    "Decêndio: 01 Dez",
+    "Decêndio: 11 Dez",
+    "Decêndio: 20 Dez"
+  )
+  return(datas)
 }
