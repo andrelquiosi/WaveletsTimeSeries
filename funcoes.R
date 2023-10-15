@@ -183,3 +183,94 @@ datas_para_plotar <- function() {
   )
   return(datas)
 }
+
+
+plot_temporal_series <- function(ano, meses, pixel) {
+  raster_ano_selecionado <- ler_arquivos_grib(ano)
+
+
+  lista_dados_decendios_ano <- c()
+  for (mes in meses) {
+    # selecionar o mês de interesse
+    grib_mes <- raster_ano_selecionado[[mes]]
+    # empilhar (list) os dados de precipitação 3 decêndios
+    grib_list_mes_d1_d11_d20 <- list_d1_d11_d20(grib_mes)
+    # selecionar o pixel de interesse em 3 decêndios
+    valores_pixel <- seleciona_pixel(pixel, grib_list_mes_d1_d11_d20)
+    # adicionar os valores de precipitação do pixel selecionado
+    # em 3 decêndios em uma lista
+    lista_dados_decendios_ano <- c(lista_dados_decendios_ano, valores_pixel)
+  }
+
+  # criar os labels para o eixo x
+  datas_decendios <- datas_para_plotar()
+
+  # obter os valores mínimos, máximos e mediana de precipitação
+  min_precipitacao <- floor(min(lista_dados_decendios_ano))
+  max_precipitacao <- ceiling(max(lista_dados_decendios_ano))
+  mediana_precipitacao <- median(lista_dados_decendios_ano)
+
+  # obter os valores mínimos, máximos e mediana de precipitação arredondados com 2 casas decimais
+  round_min_precipitacao <- round(min(lista_dados_decendios_ano), 2)
+  round_max_precipitacao <- round(max(lista_dados_decendios_ano), 2)
+  round_mediana_precipitacao <- round(mediana_precipitacao, 2)
+
+
+  # plotar os dados de precipitação 3 decêndios
+  # para o pixel selecionado em um ano específico em um gráfico de linha
+  legenda <- paste(
+    "Serie Temporal de precipitação decendial para o ano ", ano, ".",
+    "\nCorrespondente a Toledo e Cascavel - PR(pixel ", pixel, ").",
+    sep = ""
+  )
+
+  # salvar o gráfico em um arquivo png
+  nome_arquivo <- paste0(
+    "Graficos/serie_temporal_", ano, "_pixel_", pixel, ".png"
+  )
+  png(nome_arquivo, width = 10, height = 10, units = "in", res = 300)
+  plot(
+    lista_dados_decendios_ano,
+    type = "l",
+    xlab = "Decendios Mês a Mês (t)",
+    ylab = "Precipitação (mm)",
+    xaxt = "n",
+    yaxt = "n",
+    main = legenda,
+    cex = 1.5,
+    cex.lab = 1.5
+  )
+
+  # adicionar os labels para o eixo x e y
+  axis(1, at = 1:36, labels = FALSE)
+  text(1:36, par("usr")[3] - 1.5,
+    srt = 45, adj = 1,
+    xpd = TRUE, labels = datas_decendios
+  )
+  axis(2, at = min_precipitacao:max_precipitacao, las = 3, cex.axis = 1)
+
+  # adicionar pontos para os valores máximos e mínimos
+  points(which(lista_dados_decendios_ano == max(lista_dados_decendios_ano)),
+    max(lista_dados_decendios_ano),
+    col = "blue", pch = 4, cex = 3
+  )
+
+  # adicionar linhas horizontais para os valores máximos e mínimos
+  abline(h = max(lista_dados_decendios_ano), col = "blue", lty = 2)
+  text(0, max(lista_dados_decendios_ano),
+    paste("Máximo: ", round_max_precipitacao, "mm"),
+    col = "blue", adj = c(0, -.1)
+  )
+
+  abline(h = min(lista_dados_decendios_ano), col = "red", lty = 2)
+  text(0, min(lista_dados_decendios_ano),
+    paste("Mínimo: ", round_min_precipitacao, "mm"),
+    col = "red", adj = c(0, +1)
+  )
+
+  abline(h = mediana_precipitacao, col = "green", lty = 2)
+  text(0, mediana_precipitacao, paste("Mediana: ", round_mediana_precipitacao, "mm"), col = "green", adj = c(0, -1))
+
+
+  dev.off()
+}
