@@ -1,16 +1,9 @@
 # Intalação de Pacotes
-if (!require("rgdal")) install.packages("rgdal", repos = "http://cran.us.r-project.org")
 if (!require("raster")) install.packages("raster", repos = "http://cran.us.r-project.org")
-if (!require("sp")) install.packages("sp", repos = "http://cran.us.r-project.org")
 if (!require("maptools")) install.packages("maptools", repos = "http://cran.us.r-project.org")
-if (!require("rworldmap")) install.packages("rworldmap", repos = "http://cran.us.r-project.org")
-if (!require("rgeos")) install.packages("rgeos", repos = "http://cran.us.r-project.org")
-if (!require("WaveletComp")) install.packages("WaveletComp", repos = "http://cran.us.r-project.org")
-
 # Carregar Pacotes
 packs <- c(
-    "rgdal", "raster", "sp",
-    "maptools", "rworldmap", "rgeos", "WaveletComp"
+    "raster", "maptools"
 )
 lapply(packs, require, character.only = TRUE)
 
@@ -42,10 +35,12 @@ for (mes in meses) {
     lista_dados_decendios_ano <- c(lista_dados_decendios_ano, valores_pixel)
 }
 
+# criar os labels para o eixo x
+datas_decendios <- datas_para_plotar()
 
 # obter os valores mínimos e máximos de precipitação arredondados
-min_precipitacao <- floor(min(lista_dados_decendios_ano))
-max_precipitacao <- ceiling(max(lista_dados_decendios_ano))
+min_precipitacao <- round(min(lista_dados_decendios_ano), 2)
+max_precipitacao <- round(max(lista_dados_decendios_ano), 2)
 
 # plotar os dados de precipitação 3 decêndios
 # para o pixel selecionado em um ano específico em um gráfico de linha
@@ -65,9 +60,23 @@ plot(
     yaxt = "n",
     main = legenda
 )
-legend("topleft", legend = c(c("Máximo"), "Mínimo"), col = c("red", "blue"), pch = 20, cex = 2)
-axis(1, at = 1:36, labels = datas_decendios, las = 2, cex.axis = 0.7)
-axis(2, at = min_precipitacao:max_precipitacao, las = 3, cex.axis = 1)
-points(which(lista_dados_decendios_ano == max(lista_dados_decendios_ano)), max(lista_dados_decendios_ano), col = "red", pch = 20, cex = 5)
-points(which(lista_dados_decendios_ano == min(lista_dados_decendios_ano)), min(lista_dados_decendios_ano), col = "blue", pch = 20, cex = 5)
+
+# adicionar os labels para o eixo x e y
+axis(1, at = 1:36, labels = FALSE)
+text(1:36, par("usr")[3] - 1.5, srt = 45, adj = 1, xpd = TRUE, labels = datas_decendios)
+axis(2, at = min_precipitacao:max_precipitacao, las = 2, cex.axis = 1)
+
+# adicionar pontos para os valores máximos e mínimos
+points(which(lista_dados_decendios_ano == max(lista_dados_decendios_ano)), max(lista_dados_decendios_ano), col = "blue", pch = 20, cex = 5)
+points(which(lista_dados_decendios_ano == min(lista_dados_decendios_ano)), min(lista_dados_decendios_ano), col = "red", pch = 20, cex = 5)
+
+# adicionar linhas horizontais para os valores máximos e mínimos
+abline(h = max(lista_dados_decendios_ano), col = "blue")
+text(1, max(lista_dados_decendios_ano), paste("Máximo: ", max_precipitacao, "mm"), col = "blue", adj = c(0, -.1))
+
+abline(h = min(lista_dados_decendios_ano), col = "red")
+text(1, min(lista_dados_decendios_ano), paste("Mínimo: ", min_precipitacao, "mm"), col = "red", adj = c(0, -.1))
+
+
+
 dev.off()
