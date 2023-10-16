@@ -5,12 +5,11 @@ if (!require("sp")) install.packages("sp", repos = "http://cran.us.r-project.org
 if (!require("maptools")) install.packages("maptools", repos = "http://cran.us.r-project.org")
 if (!require("rworldmap")) install.packages("rworldmap", repos = "http://cran.us.r-project.org")
 if (!require("rgeos")) install.packages("rgeos", repos = "http://cran.us.r-project.org")
-if (!require("WaveletComp")) install.packages("WaveletComp", repos = "http://cran.us.r-project.org")
 
 # Carregar Pacotes
 packs <- c(
   "rgdal", "raster", "sp",
-  "maptools", "rworldmap", "rgeos", "WaveletComp"
+  "maptools", "rworldmap", "rgeos"
 )
 lapply(packs, require, character.only = TRUE)
 
@@ -38,8 +37,13 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
     stack_d1_d11_d20(raster_ano_selecionado[[mes]])
 
   # Plotar os dados do grib escolhido
-  spplot(ecmwf_step_240_t00_d1_d11_d20, scales = list(draw = TRUE))
-
+  legend <- paste(
+    "Dados de Previsão de Precipitação para 240h do ECMWF.",
+    "\nPrimeiro decêndio de Janeiro de ", ano,
+    ", para o estado do Paraná",sep = ""
+  )
+  exemplo <- spplot(ecmwf_step_240_t00_d1_d11_d20[[1]], scales = list(draw = TRUE), main = legend)
+ exemplo2 <- spplot(raster_ano_selecionado[[1]], scales = list(draw = TRUE))
   #
   clipe_ecmwf_d1_d11_d20_soma_raster <-
     processa_dados_precipitacao(raster_ano_selecionado[[mes]], mapa_parana[[1]])
@@ -52,7 +56,7 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
     ano,
     ", com previsão para 240h\nInseridos na Mesorregião do Oeste do Paraná"
   )
-  spplot(
+  exemplo3 <- spplot(
     clipe_ecmwf_d1_d11_d20_soma_raster,
     scales = list(draw = TRUE),
     sp.layout = list(
@@ -64,7 +68,7 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 
   # Plotar os dados no mapa do Paraná com a Mesorregião do Oeste do Paraná
   # e os números do grid na mesorregião
-  spplot(
+  exemplo4 <- spplot(
     clipe_ecmwf_d1_d11_d20_soma_raster,
     scales = list(draw = TRUE),
     sp.layout = list(
@@ -83,8 +87,8 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 }
 
 # Criar o arquivo PNG
-nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, "_", mes, ".png")
+nome_arquivo <- paste0("Graficos/exemploPixelsCoordenadasPrecipitacao", ".png")
 png(nome_arquivo, width = 10, height = 10, units = "in", res = 300)
-
+print(exemplo)
 # Finalizar o arquivo SVG
 dev.off()
