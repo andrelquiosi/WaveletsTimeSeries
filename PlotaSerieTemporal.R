@@ -17,9 +17,9 @@ meses <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 
 # selecionar o pixel de interesse
 pixel <- 95
-# carrega os dados (GRIB) de um ano em decendios
-# (parametro ano corresponde a pasta com os arquivo)
+
+#parametro ano corresponde a pasta com os arquivo
+#laço para plotar as series temporais: ano, meses e pixel
 for (ano in anos) {
     plot_temporal_series(ano, meses, pixel)
 }
-
