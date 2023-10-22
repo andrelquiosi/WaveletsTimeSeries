@@ -17,15 +17,26 @@ lapply(packs, require, character.only = TRUE)
 source("funcoes.R")
 
 # Criar os recortes do Paraná e da Mesorregião do Oeste do Paraná
-mapa_parana <- criar_recortes_pr()
-oestepr_sp <- criar_recortes_oeste_pr()
+# Carregar shapefiles e metadados
+brasil_shapefile <- readOGR("./Centroides", "brasil")
+# Extrair coordenadas do contorno do Paraná
+parana_contorno <- brasil_shapefile@polygons[[221]]@Polygons[[1]]@coords
+mapa_parana <- criar_recorte_regiao_especifica(parana_contorno)
+
+# Carregar coordenadas da Mesorregião do Oeste do Paraná
+coordenadas <- read.table("Centroides/oestepr_contorno.txt")
+recorte_oeste_parana <- criar_recorte_regiao_especifica(coordenadas)
 
 # Criar o círculo em Toledo e Cascavel
-centroide <- c(-53.5, -25)
-circulo_toledo_cascavel <- criar_circulo_toledo_cascavel(centroide)
+centroide <- c(-53.5, -25) # coordenadas do centroide do circulo
+  # Definir o raio do polígono circular
+  raio_poligono <- 0.36
+circulo_toledo_cascavel <- criar_poligono_circular(centroide, raio_poligono)
+
 # ano para rodar os scrypts
 anos <- c("2018", "2019", "2020", "2021", "2022")
 mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+
 {
   ano <- anos[1]
   mes <- mes[1]
@@ -34,16 +45,17 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
   raster_ano_selecionado <- ler_arquivos_grib(ano)
   # Empilhar os dados de precipitação do grib escolhodo
   ecmwf_step_240_t00_d1_d11_d20 <-
-    stack_d1_d11_d20(raster_ano_selecionado[[mes]])
+    stack_precipitacao_d1_d11_d20(raster_ano_selecionado[[mes]])
 
   # Plotar os dados do grib escolhido
   legend <- paste(
     "Dados de Previsão de Precipitação para 240h do ECMWF.",
     "\nPrimeiro decêndio de Janeiro de ", ano,
-    ", para o estado do Paraná",sep = ""
+    ", para o estado do Paraná",
+    sep = ""
   )
   exemplo <- spplot(ecmwf_step_240_t00_d1_d11_d20[[1]], scales = list(draw = TRUE), main = legend)
- exemplo2 <- spplot(raster_ano_selecionado[[1]], scales = list(draw = TRUE))
+  exemplo2 <- spplot(raster_ano_selecionado[[1]], scales = list(draw = TRUE))
   #
   clipe_ecmwf_d1_d11_d20_soma_raster <-
     processa_dados_precipitacao(raster_ano_selecionado[[mes]], mapa_parana[[1]])
@@ -60,8 +72,8 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
     clipe_ecmwf_d1_d11_d20_soma_raster,
     scales = list(draw = TRUE),
     sp.layout = list(
-      list(mapa_parana[[2]], oestepr_sp, first = FALSE),
-      list(oestepr_sp, lwd = 2, first = FALSE),
+      list(mapa_parana[[2]], recorte_oeste_parana[[1]], first = FALSE),
+      list(recorte_oeste_parana[[1]], lwd = 2, first = FALSE),
       list(circulo_toledo_cascavel, lwd = 2, first = FALSE)
     ), main = legenda
   )
@@ -72,8 +84,8 @@ mes <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
     clipe_ecmwf_d1_d11_d20_soma_raster,
     scales = list(draw = TRUE),
     sp.layout = list(
-      list(mapa_parana[[2]], oestepr_sp, first = FALSE),
-      list(oestepr_sp, lwd = 2, first = FALSE),
+      list(mapa_parana[[2]], recorte_oeste_parana[[1]], first = FALSE),
+      list(recorte_oeste_parana[[1]], lwd = 2, first = FALSE),
       list("sp.text", c(-54, -24.5), "1"),
       list("sp.text", c(-53.5, -24.5), "2"),
       list("sp.text", c(-54, -25), "3"),

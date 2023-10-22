@@ -8,7 +8,7 @@ if (!require("rgeos")) install.packages("rgeos", repos = "http://cran.us.r-proje
 # Carregar Pacotes
 packs <- c(
   "rgdal", "raster", "sp",
-  "maptools", "rworldmap", "rgeos", "WaveletComp"
+  "maptools", "rworldmap", "rgeos"
 )
 lapply(packs, require, character.only = TRUE)
 
@@ -16,12 +16,21 @@ lapply(packs, require, character.only = TRUE)
 source("funcoes.R")
 
 # Criar os recortes do Paraná e da Mesorregião do Oeste do Paraná
-mapa_parana <- criar_recortes_pr()
-oestepr_sp <- criar_recortes_oeste_pr()
+# Carregar shapefiles e metadados
+brasil_shapefile <- readOGR("./Centroides", "brasil")
+# Extrair coordenadas do contorno do Paraná
+parana_contorno <- brasil_shapefile@polygons[[221]]@Polygons[[1]]@coords
+mapa_parana <- criar_recorte_regiao_especifica(parana_contorno)
+
+# Carregar coordenadas da Mesorregião do Oeste do Paraná
+coordenadas <- read.table("Centroides/oestepr_contorno.txt")
+recorte_oeste_parana <- criar_recorte_regiao_especifica(coordenadas)
 
 # Criar o círculo em Toledo e Cascavel
 centroide <- c(-53.5, -25)
-circulo_toledo_cascavel <- criar_circulo_toledo_cascavel(centroide)
+# Definir o raio do polígono circular
+raio_poligono <- 0.36
+circulo_toledo_cascavel <- criar_poligono_circular(centroide, raio_poligono)
 
 anos <- c("2018", "2019", "2020", "2021", "2022")
 plots <- list()
@@ -30,7 +39,7 @@ for (ano in anos) {
   # carrega os dados (GRIB) de um ano em decendios
   # (parametro ano corresponde a pasta com os arquivo)
   raster_ano_selecionado <- ler_arquivos_grib(ano)
-  raster_com_decendios <- raster_arquivos(raster_ano_selecionado, mapa_parana[[1]])
+  raster_com_decendios <- rasterizar_e_recortar(raster_ano_selecionado, mapa_parana[[1]])
 
   # cria os labels para o eixo x e y
   x_labels <- c("", "54°W", "", "50°W", "", "")
@@ -45,7 +54,7 @@ for (ano in anos) {
   )
 
   # carrega as legendas dos decendios para plotar
-  legenda_decendios <- datas_para_plotar()
+  legenda_decendios <- format.Date(datas_para_carregar(ano), "%d %b")
 
   # cria o mapa com os decendios e o recorte do oeste do Paraná e Toledo e Cascavel
   s <- spplot(
@@ -57,8 +66,8 @@ for (ano in anos) {
       y = list(labels = y_labels)
     ),
     sp.layout = list(
-      list(mapa_parana[[2]], oestepr_sp, lwd = 2, col = "#3d3d3d", first = FALSE),
-      list(oestepr_sp, lwd = 1, col = "#ffffff", first = FALSE),
+      list(mapa_parana[[2]], recorte_oeste_parana[[1]], lwd = 2, col = "#3d3d3d", first = FALSE),
+      list(recorte_oeste_parana[[1]], lwd = 1, col = "#ffffff", first = FALSE),
       list(circulo_toledo_cascavel, lwd = 1, col = "#ffffff", first = FALSE)
     ),
     main = legenda,
@@ -66,7 +75,7 @@ for (ano in anos) {
   )
   plots[[ano]] <- s
 }
-
+# Salvar os mapas em arquivos PNG
 for (ano in anos) {
   # Criar o arquivo PNG
   nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, ".png")
