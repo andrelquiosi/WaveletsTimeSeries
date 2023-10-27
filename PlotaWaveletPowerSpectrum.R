@@ -1,4 +1,4 @@
-if (!require("rgdal")) install.packages("WaveletComp", repos = "http://cran.us.r-project.org")
+if (!require("WaveletComp")) install.packages("WaveletComp", repos = "http://cran.us.r-project.org")
 if (!require("raster")) install.packages("raster", repos = "http://cran.us.r-project.org")
 
 packs <- c(
@@ -11,11 +11,12 @@ source("funcoes.R")
 # carregar os dados selecionado para o pixel 95, depois plotar esses dado em um gráfico carregar os dados selecionado para o pixel 95, depois plotar esses dado em um gráfico
 
 # selecionar o pixel de interesse
-pixel <- 95
+pixel <- 94
 
 # parametro ano corresponde a pasta com os arquivo
 anos <- c("2018", "2019", "2020", "2021", "2022")
 meses <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+dias <- c("01", "11", "20")
 
 for (ano in anos) {
   raster_ano_selecionado <- ler_arquivos_grib(ano)
@@ -34,15 +35,15 @@ for (ano in anos) {
   }
 
   # criar os labels para o eixo x
-  datas_decendios <- datas_para_carregar(ano)
+  datas_decendios <- gerar_datas(ano, meses, dias)
   dados <-
     data.frame(date = datas_decendios, lista_dados_decendios_ano)
 
   names(dados) <- c("date", "Precipitação")
 
   # salvar wavelet power spectrum
-  filename <- paste("Graficos/espectro_de_potencia_wavelet_pixel", pixel, "_ano_", ano, ".png", sep = "")
-  png(filename, width = 10, height = 10, units = "in", res = 300)
+  nome_arquivo <- paste("Graficos/espectro_de_potencia_wavelet_pixel", pixel, "_ano_", ano, ".png", sep = "")
+  png(nome_arquivo, width = 1000, height = 500, units = "px")
 
   set.seed(1)
   wavelet <- analyze.wavelet(
@@ -53,13 +54,15 @@ for (ano in anos) {
     dj = 1 / 250,
     lowerPeriod = 0.150,
     upperPeriod = 8,
-    make.pval = T,
+    make.pval = TRUE,
     n.sim = 10
   )
 
   index.ticks <- seq(1, dim(dados)[1], by = 1)
   index.labels <- format.Date(datas_decendios, "%d-%b")
-  main_legend <- paste("Periodograma da série temporal do", "pixel", pixel, "(Toledo e Cascavel)", "\nAno:", ano, sep = " ")
+  # main_legend <- paste("Periodograma da série temporal do", "pixel", pixel, "(Toledo e Cascavel)", "\nAno:", ano, sep = " ")
+  main_legend <- paste("Ano", ano, sep = " ")
+
 
   wt.image(
     wavelet,
@@ -83,5 +86,8 @@ for (ano in anos) {
       padj = 0.5
     )
   )
+
+  # Adicionar rótulo ao eixo x
+  mtext("Decêndios", side = 1, line = 3.5)
   dev.off()
 }

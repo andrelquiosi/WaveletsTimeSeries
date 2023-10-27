@@ -32,7 +32,10 @@ centroide <- c(-53.5, -25)
 raio_poligono <- 0.36
 circulo_toledo_cascavel <- criar_poligono_circular(centroide, raio_poligono)
 
+# ano para rodar os scrypts
 anos <- c("2018", "2019", "2020", "2021", "2022")
+meses <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+dias <- c("01", "11", "20")
 plots <- list()
 
 for (ano in anos) {
@@ -54,7 +57,7 @@ for (ano in anos) {
   )
 
   # carrega as legendas dos decendios para plotar
-  legenda_decendios <- format.Date(datas_para_carregar(ano), "%d %b")
+  legenda_decendios <- format.Date(gerar_datas(ano,meses,dias), "%d %b")
 
   # cria o mapa com os decendios e o recorte do oeste do Paraná e Toledo e Cascavel
   s <- spplot(
@@ -66,7 +69,7 @@ for (ano in anos) {
       y = list(labels = y_labels)
     ),
     sp.layout = list(
-      list(mapa_parana[[2]], recorte_oeste_parana[[1]], lwd = 2, col = "#3d3d3d", first = FALSE),
+      list(mapa_parana[[2]], lwd = 2, col = "#3d3d3d", first = FALSE),
       list(recorte_oeste_parana[[1]], lwd = 1, col = "#ffffff", first = FALSE),
       list(circulo_toledo_cascavel, lwd = 1, col = "#ffffff", first = FALSE)
     ),
@@ -79,7 +82,7 @@ for (ano in anos) {
 for (ano in anos) {
   # Criar o arquivo PNG
   nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, ".png")
-  png(nome_arquivo, width = 10, height = 10, units = "in", res = 300)
+  png(nome_arquivo, width = 900, height = 400, units = "px")
 
   # Plotar o mapa
   print(plots[[ano]])

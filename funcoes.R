@@ -122,44 +122,25 @@ rasterizar_e_recortar <- function(lista_arquivos_grib, poligono_recorte) {
   return(raster_recortado)
 }
 
-datas_para_carregar <- function(ano) {
-  datas <- c(
-    paste(ano, "-01-01", sep = ""),
-    paste(ano, "-01-11", sep = ""),
-    paste(ano, "-01-20", sep = ""),
-    paste(ano, "-02-01", sep = ""),
-    paste(ano, "-02-11", sep = ""),
-    paste(ano, "-02-20", sep = ""),
-    paste(ano, "-03-01", sep = ""),
-    paste(ano, "-03-11", sep = ""),
-    paste(ano, "-03-20", sep = ""),
-    paste(ano, "-04-01", sep = ""),
-    paste(ano, "-04-11", sep = ""),
-    paste(ano, "-04-20", sep = ""),
-    paste(ano, "-05-01", sep = ""),
-    paste(ano, "-05-11", sep = ""),
-    paste(ano, "-05-20", sep = ""),
-    paste(ano, "-06-01", sep = ""),
-    paste(ano, "-06-11", sep = ""),
-    paste(ano, "-06-20", sep = ""),
-    paste(ano, "-07-01", sep = ""),
-    paste(ano, "-07-11", sep = ""),
-    paste(ano, "-07-20", sep = ""),
-    paste(ano, "-08-01", sep = ""),
-    paste(ano, "-08-11", sep = ""),
-    paste(ano, "-08-20", sep = ""),
-    paste(ano, "-09-01", sep = ""),
-    paste(ano, "-09-11", sep = ""),
-    paste(ano, "-09-20", sep = ""),
-    paste(ano, "-10-01", sep = ""),
-    paste(ano, "-10-11", sep = ""),
-    paste(ano, "-10-20", sep = ""),
-    paste(ano, "-11-01", sep = ""),
-    paste(ano, "-11-11", sep = ""),
-    paste(ano, "-11-20", sep = ""),
-    paste(ano, "-12-01", sep = ""),
-    paste(ano, "-12-11", sep = ""),
-    paste(ano, "-12-20", sep = "")
-  )
+recortar_rasters <- function(pilha_rasters, poligono_recorte) {
+  # Rasterizar o polígono de recorte
+  raster_recorte <- rasterize(poligono_recorte, pilha_rasters)
+
+  # Recortar o raster para o polígono de recorte
+  raster_recortado <- mask(pilha_rasters, raster_recorte)
+
+  # Retornar o raster recortado
+  return(raster_recortado)
+}
+
+# Função para gerar as datas (ano, meses e dias)
+gerar_datas <- function(ano, meses, dias) {
+  datas <- c()
+  for (mes in meses) {
+    for (dia in dias) {
+      data_completa <- paste(ano, mes, dia, sep = "-")
+      datas <- c(datas, data_completa)
+    }
+  }
   return(as.Date(datas, format = "%Y-%m-%d"))
 }

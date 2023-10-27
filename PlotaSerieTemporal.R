@@ -13,10 +13,10 @@ source("funcoes.R")
 
 anos <- c("2018", "2019", "2020", "2021", "2022")
 meses <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
-
+dias <- c("01", "11", "20")
 
 # selecionar o pixel de interesse
-pixel <- 95
+pixel <- 94
 
 # parametro ano corresponde a pasta com os arquivo
 # laço para plotar as series temporais: ano, meses e pixel
@@ -38,7 +38,7 @@ for (ano in anos) {
     }
 
     # criar os labels para o eixo x
-    datas_decendios <- datas_para_plotar()
+    legenda_decendios <- format.Date(gerar_datas(ano, meses, dias), "%d %b")
 
     # obter os valores mínimos, máximos e mediana de precipitação
     min_precipitacao <- floor(min(lista_dados_decendios_ano))
@@ -53,9 +53,13 @@ for (ano in anos) {
 
     # plotar os dados de precipitação 3 decêndios
     # para o pixel selecionado em um ano específico em um gráfico de linha
+    # legenda <- paste(
+    #     "Serie Temporal de precipitação decendial para o ano ", ano, ".",
+    #     "\nCorrespondente a Toledo e Cascavel - PR(pixel ", pixel, ").",
+    #     sep = ""
+    # )
     legenda <- paste(
-        "Serie Temporal de precipitação decendial para o ano ", ano, ".",
-        "\nCorrespondente a Toledo e Cascavel - PR(pixel ", pixel, ").",
+        "Serie Temporal para o ano ", ano,
         sep = ""
     )
 
@@ -63,7 +67,7 @@ for (ano in anos) {
     nome_arquivo <- paste0(
         "Graficos/serie_temporal_", ano, "_pixel_", pixel, ".png"
     )
-    png(nome_arquivo, width = 10, height = 10, units = "in", res = 300)
+    png(nome_arquivo, width = 1000, height = 500, units = "px")
     plot(
         lista_dados_decendios_ano,
         type = "l",
@@ -79,8 +83,8 @@ for (ano in anos) {
     # adicionar os labels para o eixo x e y
     axis(1, at = 1:36, labels = FALSE)
     text(1:36, par("usr")[3] - 1.5,
-        srt = 45, adj = 1,
-        xpd = TRUE, labels = datas_decendios
+        srt = 45, adj = 1.1,
+        xpd = TRUE, labels = legenda_decendios
     )
     axis(2, at = min_precipitacao:max_precipitacao, las = 3, cex.axis = 1)
 
@@ -94,17 +98,17 @@ for (ano in anos) {
     abline(h = max(lista_dados_decendios_ano), col = "blue", lty = 2)
     text(0, max(lista_dados_decendios_ano),
         paste("Máximo: ", round_max_precipitacao, "mm"),
-        col = "blue", adj = c(0, -.1)
+        col = "blue", adj = c(0, -0.25)
     )
 
     abline(h = min(lista_dados_decendios_ano), col = "red", lty = 2)
     text(0, min(lista_dados_decendios_ano),
         paste("Mínimo: ", round_min_precipitacao, "mm"),
-        col = "red", adj = c(0, +1)
+        col = "red", adj = c(0, +1.1)
     )
 
-    abline(h = mediana_precipitacao, col = "green", lty = 2)
-    text(0, mediana_precipitacao, paste("Mediana: ", round_mediana_precipitacao, "mm"), col = "green", adj = c(0, -1))
+    abline(h = mediana_precipitacao, col = "#006100", lty = 2)
+    text(0, mediana_precipitacao, paste("Mediana: ", round_mediana_precipitacao, "mm"), col = "#006100", adj = c(0, -0.25))
 
 
     dev.off()
