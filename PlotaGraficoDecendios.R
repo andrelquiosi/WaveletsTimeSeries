@@ -50,14 +50,13 @@ for (ano in anos) {
 
   # cria a legenda para o mapa
   legenda <- paste(
-    "Dados de previsão de precipitação do ECMWF, para o ano de ",
+    "Dados de previsão de precipitação para o ano de ",
     ano,
-    ", com previsão para 240h\nInseridos na mesorregião do Oeste do Paraná",
     sep = ""
   )
 
   # carrega as legendas dos decendios para plotar
-  legenda_decendios <- format.Date(gerar_datas(ano,meses,dias), "%d %b")
+  legenda_decendios <- format.Date(gerar_datas(ano, meses, dias), "%d %b")
 
   # cria o mapa com os decendios e o recorte do oeste do Paraná e Toledo e Cascavel
   s <- spplot(
@@ -74,7 +73,14 @@ for (ano in anos) {
       list(circulo_toledo_cascavel, lwd = 1, col = "#ffffff", first = FALSE)
     ),
     main = legenda,
-    names.attr = legenda_decendios
+    names.attr = legenda_decendios,
+    colorkey = list(
+      space = "bottom",
+      labels = list(
+        at = seq(0, 500, 50),
+        labels = paste(seq(0, 500, 50), "mm")
+      )
+    )
   )
   plots[[ano]] <- s
 }
