@@ -6,11 +6,13 @@ if (!require("maptools")) install.packages("maptools", repos = "http://cran.us.r
 if (!require("rworldmap")) install.packages("rworldmap", repos = "http://cran.us.r-project.org")
 if (!require("rgeos")) install.packages("rgeos", repos = "http://cran.us.r-project.org")
 
-# Carregar Pacotes
+# Carregar Pacotes para avariavel
 packs <- c(
   "rgdal", "raster", "sp",
   "maptools", "rworldmap", "rgeos"
 )
+
+# carrega os pacotes
 lapply(packs, require, character.only = TRUE)
 
 # Carregar Funções
@@ -51,7 +53,7 @@ dias <- c("01", "11", "20")
   ecmwf_step_240_t00_d1_d11_d20 <-
     stack_precipitacao_d1_d11_d20(raster_ano_selecionado[[mes]])
 
-  raster_com_decendios <- recortar_rasters(ecmwf_step_240_t00_d1_d11_d20[[1]], mapa_parana[[1]])
+  raster_com_decendios <- recortar_rasters(ecmwf_step_240_t00_d1_d11_d20[[1]], recorte_oeste_parana[[1]])
 
   # Plotar os dados do grib escolhido
   legend <- paste(
@@ -85,7 +87,7 @@ dias <- c("01", "11", "20")
   # Plotar os dados no mapa do Paraná com a Mesorregião do Oeste do Paraná
   # e os números do grid na mesorregião
   exemplo4 <- spplot(
-    clipe_ecmwf_d1_d11_d20_soma_raster[[1]],
+    raster_com_decendios[[1]],
     scales = list(draw = TRUE),
     sp.layout = list(
       list(mapa_parana[[2]], first = FALSE),
@@ -105,7 +107,7 @@ dias <- c("01", "11", "20")
 # Criar o arquivo PNG
 nome_arquivo <- paste0("Graficos/exemploPixelsCoordenadasPrecipitacao", ".png")
 png(nome_arquivo, width = 10, height = 8, units = "in", res = 300)
-print(exemplo)
+print(exemplo3)
 # Finalizar o arquivo SVG
 dev.off()
 

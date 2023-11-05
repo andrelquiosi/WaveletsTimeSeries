@@ -88,7 +88,7 @@ for (ano in anos) {
 for (ano in anos) {
   # Criar o arquivo PNG
   nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, ".png")
-  png(nome_arquivo, width = 900, height = 400, units = "px")
+  png(nome_arquivo, width = 2300, height = 1000, res = 130)
 
   # Plotar o mapa
   print(plots[[ano]])

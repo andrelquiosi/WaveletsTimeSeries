@@ -8,7 +8,6 @@ packs <- c(
 lapply(packs, require, character.only = TRUE)
 
 source("funcoes.R")
-# carregar os dados selecionado para o pixel 95, depois plotar esses dado em um gráfico carregar os dados selecionado para o pixel 95, depois plotar esses dado em um gráfico
 
 # selecionar o pixel de interesse
 pixel <- 94
@@ -41,10 +40,11 @@ for (ano in anos) {
 
   names(dados) <- c("date", "Precipitação")
 
-  # salvar wavelet power spectrum
+  # criar imagem para salvar wavelet power spectrum
   nome_arquivo <- paste("Graficos/espectro_de_potencia_wavelet_pixel", pixel, "_ano_", ano, ".png", sep = "")
   png(nome_arquivo, width = 1000, height = 500, units = "px")
 
+  # Cálculo do espectro de potência wavelet de uma única série temporal
   set.seed(1)
   wavelet <- analyze.wavelet(
     dados,
@@ -58,12 +58,8 @@ for (ano in anos) {
     n.sim = 10
   )
 
-  index.ticks <- seq(1, dim(dados)[1], by = 1)
-  index.labels <- format.Date(datas_decendios, "%d-%b")
-  # main_legend <- paste("Periodograma da série temporal do", "pixel", pixel, "(Toledo e Cascavel)", "\nAno:", ano, sep = " ")
+  # Gráfico de imagem do espectro de potência wavelet de uma única série temporal
   main_legend <- paste("Ano", ano, sep = " ")
-
-
   wt.image(
     wavelet,
     color.key = "quantile",
@@ -79,8 +75,8 @@ for (ano in anos) {
     lwd.axis = 1,
     label.time.axis = TRUE,
     spec.time.axis = list(
-      at = index.ticks,
-      labels = index.labels,
+      at = seq(1, dim(dados)[1], by = 1),
+      labels = format.Date(datas_decendios, "%d-%b"),
       las = 2,
       hadj = 1,
       padj = 0.5
@@ -89,5 +85,6 @@ for (ano in anos) {
 
   # Adicionar rótulo ao eixo x
   mtext("Decêndios", side = 1, line = 3.5)
+
   dev.off()
 }
