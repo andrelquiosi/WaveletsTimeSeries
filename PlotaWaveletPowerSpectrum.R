@@ -35,10 +35,9 @@ for (ano in anos) {
 
   # criar os labels para o eixo x
   datas_decendios <- gerar_datas(ano, meses, dias)
-  dados <-
-    data.frame(date = datas_decendios, lista_dados_decendios_ano)
+  dados <- data.frame(date = datas_decendios, lista_dados_decendios_ano)
 
-  names(dados) <- c("date", "Precipitação")
+  names(dados) <- c("date", "Precipitacao")
 
   # criar imagem para salvar wavelet power spectrum
   nome_arquivo <- paste("Graficos/espectro_de_potencia_wavelet_pixel", pixel, "_ano_", ano, ".png", sep = "")
@@ -48,7 +47,7 @@ for (ano in anos) {
   set.seed(1)
   wavelet <- analyze.wavelet(
     dados,
-    "Precipitação",
+    "Precipitacao",
     loess.span = 0,
     dt = 1 / 12,
     dj = 1 / 250,
