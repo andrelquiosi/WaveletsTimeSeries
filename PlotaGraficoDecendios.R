@@ -69,10 +69,9 @@ for (ano in anos) {
     ),
     sp.layout = list(
       list(mapa_parana[[2]], lwd = 2, col = "#3d3d3d", first = FALSE),
-      list(recorte_oeste_parana[[1]], lwd = 1, col = "#ffffff", first = FALSE),
-      list(circulo_toledo_cascavel, lwd = 1, col = "#ffffff", first = FALSE)
+      list(recorte_oeste_parana[[1]], lwd = 2, col = "#ffffff", first = FALSE),
+      list(circulo_toledo_cascavel, lwd = 2, col = "#ffffff", first = FALSE)
     ),
-    main = legenda,
     names.attr = legenda_decendios,
     colorkey = list(
       space = "bottom",
@@ -88,7 +87,7 @@ for (ano in anos) {
 for (ano in anos) {
   # Criar o arquivo PNG
   nome_arquivo <- paste0("Graficos/parana_oeste_toledo_cascavel_", ano, ".png")
-  png(nome_arquivo, width = 2300, height = 1000, res = 130)
+  png(nome_arquivo, width = 1080, height = 1150, res = 130)
 
   # Plotar o mapa
   print(plots[[ano]])

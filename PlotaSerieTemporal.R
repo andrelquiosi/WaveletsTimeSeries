@@ -75,7 +75,7 @@ for (ano in anos) {
         ylab = "Precipitação (mm)",
         xaxt = "n",
         yaxt = "n",
-        main = legenda,
+        main = NULL,
         cex = 1.5,
         cex.lab = 1.5
     )

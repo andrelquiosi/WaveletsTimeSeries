@@ -53,7 +53,7 @@ dias <- c("01", "11", "20")
   ecmwf_step_240_t00_d1_d11_d20 <-
     stack_precipitacao_d1_d11_d20(raster_ano_selecionado[[mes]])
 
-  raster_com_decendios <- recortar_rasters(ecmwf_step_240_t00_d1_d11_d20[[1]], recorte_oeste_parana[[1]])
+  raster_com_decendios <- recortar_rasters(ecmwf_step_240_t00_d1_d11_d20[[1]], mapa_parana[[1]])
 
   # Plotar os dados do grib escolhido
   legend <- paste(
@@ -78,10 +78,11 @@ dias <- c("01", "11", "20")
     raster_com_decendios,
     scales = list(draw = TRUE),
     sp.layout = list(
-      list(mapa_parana[[2]], first = FALSE),
-      list(recorte_oeste_parana[[1]], lwd = 1, first = FALSE),
-      list(circulo_toledo_cascavel, lwd = 2, first = FALSE)
-    ), main = legenda
+      list(mapa_parana[[2]],lwd = 4, first = FALSE),
+      list(recorte_oeste_parana[[1]], lwd = 4, first = FALSE),
+      list(circulo_toledo_cascavel, lwd = 4, first = FALSE)
+    )
+    # , main = legenda
   )
 
   # Plotar os dados no mapa do Paraná com a Mesorregião do Oeste do Paraná
@@ -105,12 +106,11 @@ dias <- c("01", "11", "20")
 }
 
 # Criar o arquivo PNG
-nome_arquivo <- paste0("Graficos/exemploPixelsCoordenadasPrecipitacao", ".png")
-png(nome_arquivo, width = 10, height = 8, units = "in", res = 300)
+nome_arquivo <- paste0("Graficos/exemploPixelsCoordenadasPrecipitacao2", ".png")
+png(nome_arquivo, width = 10, height = 7, units = "in", res = 300)
 print(exemplo3)
 # Finalizar o arquivo SVG
 dev.off()
-
 
 
 pixels <- rasterToPoints(ecmwf_step_240_t00_d1_d11_d20[[1]])
